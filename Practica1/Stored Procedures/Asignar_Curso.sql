@@ -16,10 +16,18 @@ ELSE
 		        IF(SELECT CreditsRequired FROM practica1.Course WHERE @COURSECODE=CodCourse)>@CREDITOS BEGIN PRINT 'NO CUENTA CON LOS CREDITOS NECESARIOS' END;
 		        ELSE
                     BEGIN
-                        INSERT INTO PRACTICA1.CourseAssignment(StudentId,CourseCodCourse) VALUES(@ID,@COURSECODE);
-                        INSERT INTO practica1.Notification(Date,UserId,Message) VALUES(GETDATE(),@ID,'ASIGNACION EXITOSA!');
                         SET @PROFE=(SELECT TutorId FROM practica1.CourseTutor WHERE CourseCodCourse=@COURSECODE);
-                        INSERT INTO practica1.Notification(Date,UserId,Message) VALUES(GETDATE(),@PROFE,'NUEVO ESTUDIANTE ASIGNADO!');
+                        BEGIN TRANSACTION
+                        BEGIN TRY
+                            INSERT INTO PRACTICA1.CourseAssignment(StudentId,CourseCodCourse) VALUES(@ID,@COURSECODE);
+                            INSERT INTO practica1.Notification(Date,UserId,Message) VALUES(GETDATE(),@ID,'ASIGNACION EXITOSA!');
+                            INSERT INTO practica1.Notification(Date,UserId,Message) VALUES(GETDATE(),@PROFE,'NUEVO ESTUDIANTE ASIGNADO!');
+                        END TRY
+                        BEGIN CATCH
+                            PRINT 'NO FUE POSIBLE REALIZAR LA ASIGNACION'
+                            ROLLBACK TRANSACTION
+                        END CATCH
+
                     END;
             END;
 	END;
