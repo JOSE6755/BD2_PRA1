@@ -1,0 +1,19 @@
+
+Conectarse a EC2:
+ssh -i "LlaveBD2.pem" ubuntu@ec2-18-188-37-39.us-east-2.compute.amazonaws.com
+
+Copiar archivos de maquina local a EC2:
+scp -i "LlaveBD2.pem" "C:\Users\ka_sa\Downloads\Archivos de entrada - CSV (2)\Archivos de entrada - CSV\LogActividades2_v2.csv" ubuntu@ec2-18-188-37-39.us-east-2.compute.amazonaws.com:/home/ubuntu
+
+Conectarse a mysql en modo carga de archivo local:
+mysql --local-infile=1 -u root -p
+
+Carga masiva de datos a mysql:
+LOAD DATA LOCAL INFILE '/home/ubuntu/LogHabitaciones.csv' INTO TABLE LOG_HABITACION FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
+Creacion de full backup:
+mysqldump -u root -p Practica2BD2 > SegundoFullBackup.sql
+
+Creacion de backup incremental (antes usar sudo -i):
+mysqlbinlog /var/lib/mysql/binlog.000045 > /home/ubuntu/QuintoBackupIncremental.sql
+
